@@ -43,10 +43,8 @@ def bootstrap(
     device_id = body.device_id.upper()
     existing = db.query(Device).filter(Device.id == device_id).first()
     if existing and existing.paired:
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            "Device is already paired. Use existing token or admin reset procedure."
-        )
+        # Reflashed or factory reset hardware re-enrolling with valid enrollment key
+        existing.paired = 0
     
     code = new_code()
     ACTIVE_PAIR_CODES[device_id] = code
