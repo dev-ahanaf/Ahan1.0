@@ -6,28 +6,31 @@
 
 **কী পাচ্ছ না:** আগে থেকেই compiled `.bin` বা real hardware-এ verified firmware। এই পরিবেশে তোমার আসল repository, ESP-IDF toolchain ও physical device উপস্থিত নেই, তাই source installer তৈরি করে unit tests চালানো হয়েছে, device build/flash হয়নি। OLED-এ custom graphics/logo এবং নতুন OTA dashboard এই প্যাকেজের scope-এর বাইরে।
 
-## 1. Wiring: default `myvoice` profile
+## 1. তোমার পাঠানো SKR Diagram অনুযায়ী wiring: `xiaozhi` profile
 
-এটি তোমার পুরোনো **MyVoice OS** project-এর পূর্বনির্ধারিত wiring অনুসারে। **চিপে বাস্তবে যে pin যুক্ত আছে তা যাচাই করে তবে flash করবে।**
+এই diagram এর জন্য `--profile xiaozhi` ব্যবহার করবে। পুরোনো `myvoice` profile ব্যবহার **করবে না**; সেখানে mic/amp/OLED GPIO আলাদা।
 
-| Peripheral | Module Pin | ESP32 Pin |
+| Peripheral | Module pin | ESP32 GPIO |
 |---|---|---|
-| INMP441 | SCK / BCLK | GPIO26 |
-| INMP441 | WS / LRCLK | GPIO25 |
-| INMP441 | SD | GPIO33 |
+| INMP441 | SCK | GPIO26 |
+| INMP441 | WS | GPIO25 |
+| INMP441 | SD | GPIO32 |
+| INMP441 | VDD, GND, L/R | 3.3V, GND, GND |
+| MAX98357A | DIN | GPIO33 |
 | MAX98357A | BCLK | GPIO14 |
-| MAX98357A | LRC / WS | GPIO13 |
-| MAX98357A | DIN | GPIO22 |
-| OLED SSD1306 | SDA | GPIO18 |
-| OLED SSD1306 | SCL | GPIO19 |
-| Push-to-talk | Button to GND | GPIO27 |
-| Onboard BOOT | Existing onboard button | GPIO0 |
+| MAX98357A | LRC | GPIO27 |
+| OLED SSD1306 | SDA | GPIO4 |
+| OLED SSD1306 | SCL | GPIO15 |
+| LED | resistor then anode | GPIO18 |
+| Onboard BOOT | built-in button | GPIO0 |
 
-INMP441 VDD = 3.3V, GND = GND। OLED VCC সাধারণত 3.3V (module rating দেখো)। Amplifier power তার board specification অনুযায়ী regulated supply দাও; all GND common। 3.7V battery-কে সরাসরি ESP32 5V/VIN pin-এ দিয়ো না।
+এই diagram-এ GPIO5 বা GPIO19-এ আলাদা push-to-talk button নেই। সাধারণত onboard BOOT (GPIO0) দিয়ে প্রথম কথোপকথন শুরু করা যায়, তবে বাস্তব আচরণ upstream board code অনুযায়ী যাচাই করবে। GPIO27 speaker-এর LRC line—সেখানে কখনও button বসাবে না।
 
-`--profile xiaozhi` বেছে নিলে upstream bread-compact ESP32 pinmap অনুযায়ী build হবে: mic GPIO 26/25/32, amplifier GPIO14/27/33, OLED GPIO4/15, PTT touch GPIO5। **এটা default `myvoice` থেকে আলাদা।**
+**সতর্কতা:** SKR website-এর লেখা amplifier pin list এবং ছবির মধ্যে DIN/LRC এর ভুল/অসামঞ্জস্য আছে। তোমার পাঠানো ছবির mapping উপরোক্ত table-এর সঙ্গে এবং XiaoZhi upstream config.h-এর সঙ্গে মেলে।
 
-Push-to-talk: GPIO27 button চেপে ধরে বলো, ছেড়ে দিলে listening বন্ধ হবে। Onboard BOOT GPIO0-এ upstream click-to-toggle behavior থাকবে।
+MAX98357A-এর speaker outputs ESP32 ground-এ যুক্ত করবে না। Power supply যথেষ্ট current দিতে পারছে কি না যাচাই করবে।
+
+**এই ZIP-এ কোনো compiled .bin নেই। Firmware build ও hardware test ছাড়া website থেকে flash করবে না।**
 
 ## 2. Requirements
 
@@ -51,7 +54,7 @@ ZIP extract করো। Terminal-এ ZIP extracted folder থেকে:
 
 ```bash
 python3 apply_falcon.py --repo ../xiaozhi-esp32 \
-  --profile myvoice --flash-size 4MB \
+  --profile xiaozhi --flash-size 4MB \
   --ota-url http://192.168.1.100:8002/xiaozhi/ota/ \
   --dry-run
 ```
@@ -60,7 +63,7 @@ python3 apply_falcon.py --repo ../xiaozhi-esp32 \
 
 ```bash
 python3 apply_falcon.py --repo ../xiaozhi-esp32 \
-  --profile myvoice --flash-size 4MB \
+  --profile xiaozhi --flash-size 4MB \
   --ota-url http://192.168.1.100:8002/xiaozhi/ota/
 ```
 
@@ -108,7 +111,7 @@ First boot-এ Wi-Fi provisioning setup করো। OLED status, mic, speaker �
 2. OLED display জ্বলে এবং Wi-Fi setup হয়।
 3. Device তোমার server-এর OTA endpoint reach করে।
 4. Device activation/pairing নিজস্ব dashboard-এ হয়।
-5. GPIO27 ধরে কথা বললে ASR → LLM → TTS → speaker response হয়।
+5. Onboard BOOT (GPIO0) দিয়ে listening activate করে ASR → LLM → TTS → speaker response test করো।
 6. PIN mismatch, no sound, frozen display হলে wiring / supply পরীক্ষা করো।
 
 **Tests included:** `python3 -m unittest discover -s tests -v` — script patching tests, not hardware tests।

@@ -1,0 +1,29 @@
+FALCON AI -- CORRECTED FOR THE USER'S SKR WIRING DIAGRAM
+========================================================
+
+NOT A COMPILED FIRMWARE. DO NOT ATTEMPT TO FLASH THIS ZIP DIRECTLY.
+
+PIN MAP FROM THE IMAGE:
+INMP441: SCK=GPIO26 WS=GPIO25 SD=GPIO32, L/R=GND
+MAX98357A: DIN=GPIO33 BCLK=GPIO14 LRC=GPIO27
+OLED SSD1306: SDA=GPIO4 SCL=GPIO15
+LED: GPIO18 via a 220-ohm resistor; BOOT button: GPIO0
+No separate GPIO5/GPIO19 button is drawn.
+
+IMPORTANT: The tutorial webpage text has a contradictory amplifier pin list.
+Follow the uploaded diagram and the official XiaoZhi bread-compact-esp32 config.h.
+
+FIRST: Inspect your existing xiaozhi-esp32 repo and any uncommitted changes.
+The overlay refuses to overwrite a pre-existing falcon-ai-esp32 board directory.
+
+SECOND (example; replace server IP and flash capacity with actual values):
+  cd source_overlay
+  python3 apply_falcon.py --repo /path/to/xiaozhi-esp32 --profile xiaozhi --flash-size 4MB --ota-url http://YOUR_SERVER_IP:8002/xiaozhi/ota/
+
+THIRD: Build using ESP-IDF in your own cloned repo (see source_overlay/README_BN.md).
+
+FOURTH: Publish a real compiled merged image:
+  python3 tools/publish_firmware.py --idf-build /path/to/xiaozhi-esp32/build --version 0.1.0 --flash-size 4MB --profile xiaozhi
+
+FIFTH: Deploy site/ under HTTPS and test via USB using desktop Chrome/Edge.
+Actual USB flashing, server pairing, audio and display remain UNVERIFIED.

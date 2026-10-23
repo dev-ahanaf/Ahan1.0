@@ -1,6 +1,9 @@
 # Falcon AI - Web Firmware Flasher for regular ESP32
 
-This ZIP includes a complete **static website for installing compiled ESP32 firmware via USB from your own website**, a safe firmware publisher, automated tests, and the **previous Falcon AI source overlay** for your cloned `xiaozhi-esp32` repository.
+IMPORTANT: This is source + website only, NOT a flashable firmware .bin.
+The correct selection for your uploaded SKR circuit diagram is `--profile xiaozhi`, NOT `--profile myvoice`.
+
+This ZIP includes a complete **static website for installing compiled ESP32 firmware via USB from your own website**, a safe firmware publisher, automated tests, and a **corrected source overlay matched to your SKR diagram** for your cloned `xiaozhi-esp32` repository.
 
 > **There is NO compiled firmware in this ZIP.** The previous ZIP contained source code, not a runnable `.bin`. The website intentionally disables flashing until you publish your **real, built** ESP32 firmware. This prevents mistakenly flashing an empty or dummy image.
 
@@ -22,6 +25,12 @@ FalconAI_WebFlasher/
     └── test_publish.py
 ```
 
+## Wiring for the uploaded SKR diagram
+
+INMP441: SCK=26, WS=25, SD=32, L/R=GND; MAX98357A: DIN=33, BCLK=14, LRC=27; OLED: SDA=4, SCL=15; LED via resistor=18; onboard BOOT=GPIO0. No external GPIO5 touch/button is included in the diagram.
+
+The website referenced in the user request contains an inconsistent written amplifier pin list; the diagram itself and official XiaoZhi board header agree on this pinout.
+
 ## Step 1: Build firmware on your computer (once per version)
 
 Use ESP-IDF matching the current `xiaozhi-esp32` repository and your **actual flash size**. First apply your personal board overlay (if you have not already):
@@ -29,7 +38,7 @@ Use ESP-IDF matching the current `xiaozhi-esp32` repository and your **actual fl
 ```bash
 cd FalconAI_WebFlasher/source_overlay
 python3 apply_falcon.py --repo /path/to/xiaozhi-esp32 \
-  --profile myvoice --flash-size 4MB \
+  --profile xiaozhi --flash-size 4MB \
   --ota-url http://YOUR-LAN-SERVER-IP:8002/xiaozhi/ota/
 ```
 
@@ -51,7 +60,7 @@ Run from any directory (adjust paths):
 ```bash
 python3 FalconAI_WebFlasher/tools/publish_firmware.py \
   --merged /path/to/xiaozhi-esp32/build/merged-binary.bin \
-  --version 0.1.0 --flash-size 4MB --profile myvoice
+  --version 0.1.0 --flash-size 4MB --profile xiaozhi
 ```
 
 **Option B: Your ESP-IDF build has `flasher_args.json`**
@@ -61,7 +70,7 @@ Install `esptool` first: `python3 -m pip install esptool`.
 ```bash
 python3 FalconAI_WebFlasher/tools/publish_firmware.py \
   --idf-build /path/to/xiaozhi-esp32/build \
-  --version 0.1.0 --flash-size 4MB --profile myvoice
+  --version 0.1.0 --flash-size 4MB --profile xiaozhi
 ```
 
 This **generates**:

@@ -66,12 +66,12 @@
         throw new Error('Firmware metadata mismatch');
       }
       $('firmware-name').textContent = manifest.name || 'Falcon AI ESP32';
-      $('board-profile').textContent = release.profile === 'myvoice' ? 'MyVoice' : 'XiaoZhi';
+      $('board-profile').textContent = release.profile === 'myvoice' ? 'MyVoice (not SKR diagram)' : 'SKR / XiaoZhi diagram';
       if (release.profile === 'xiaozhi') {
-        $('mic-pins').textContent = 'INMP441 / GPIO 26, 25, 32';
-        $('speaker-pins').textContent = 'MAX98357A / GPIO 14, 27, 33';
+        $('mic-pins').textContent = 'INMP441 / SCK 26, WS 25, SD 32';
+        $('speaker-pins').textContent = 'MAX98357A / DIN 33, BCLK 14, LRC 27';
         $('oled-pins').textContent = 'SSD1306 / SDA 4, SCL 15';
-        $('button-pin').textContent = 'GPIO 5 (touch input)';
+        $('button-pin').textContent = 'Onboard BOOT (GPIO0); GPIO5 touch not wired';
       }
       mark(`v${manifest.version} · ${release.flash_size} · ${release.profile} profile · ${(release.size_bytes/1048576).toFixed(2)} MiB`, 'ready');
       blocked.hidden = true;

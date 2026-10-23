@@ -26,6 +26,7 @@ PROFILES = {
         'BOOT_BUTTON_GPIO': 0, 'TOUCH_BUTTON_GPIO': 27,
         'ASR_BUTTON_GPIO': None, 'LAMP_GPIO': 23,
     },
+    # Matches the user's SKR diagram and upstream bread-compact board.
     'xiaozhi': {
         'AUDIO_I2S_MIC_GPIO_WS': 25, 'AUDIO_I2S_MIC_GPIO_SCK': 26,
         'AUDIO_I2S_MIC_GPIO_DIN': 32, 'AUDIO_I2S_SPK_GPIO_DOUT': 33,
@@ -188,7 +189,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='Add personal Falcon AI board to existing XiaoZhi firmware repo')
     parser.add_argument('--repo', type=Path, required=True, help='Path to your cloned xiaozhi-esp32 directory')
     parser.add_argument('--ota-url', required=True, help='Own server OTA endpoint, e.g. http://192.168.1.100:8002/xiaozhi/ota/')
-    parser.add_argument('--profile', choices=tuple(PROFILES), default='myvoice')
+    parser.add_argument('--profile', choices=tuple(PROFILES), default='xiaozhi')
     parser.add_argument('--flash-size', choices=('4MB', '8MB', '16MB'), default='4MB')
     parser.add_argument('--dry-run', action='store_true')
     a = parser.parse_args()

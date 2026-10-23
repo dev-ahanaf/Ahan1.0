@@ -54,7 +54,7 @@ app.include_router(ota_router)
 # Web Flasher static routes
 FLASH_DIR = STATIC_DIR / "flash"
 if not FLASH_DIR.exists():
-    FLASH_DIR = ROOT_DIR.parent / "FalconAI_WebFlasher" / "site"
+    FLASH_DIR = ROOT_DIR.parent / "FalconAI_SKR_Diagram_WebFlasher" / "site"
 
 if FLASH_DIR.exists():
     app.mount("/flash", StaticFiles(directory=str(FLASH_DIR), html=True), name="flash")

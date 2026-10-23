@@ -17,25 +17,26 @@
  * ├─────────────────┼──────────┼──────────────┼───────────────────────────────────────┤
  * │ INMP441 Mic     │ VDD      │ 3.3V         │ 3.3V power only                       │
  * │                 │ GND      │ GND          │ Common ground                         │
- * │                 │ SD       │ GPIO 33      │ Serial Data Out                       │
+ * │                 │ SD       │ GPIO 32      │ Serial Data Out                       │
  * │                 │ WS       │ GPIO 25      │ Word Select (LRCL)                    │
  * │                 │ SCK      │ GPIO 26      │ Bit Clock (BCLK)                      │
  * │                 │ L/R      │ GND          │ Left channel                          │
  * ├─────────────────┼──────────┼──────────────┼───────────────────────────────────────┤
  * │ MAX98357A Amp   │ VIN      │ 5V / VIN     │ 5V power recommended for 3W output    │
  * │                 │ GND      │ GND          │ Common ground                         │
- * │                 │ DIN      │ GPIO 22      │ Serial Data In                        │
+ * │                 │ DIN      │ GPIO 33      │ Serial Data In                        │
  * │                 │ BCLK     │ GPIO 14      │ Bit Clock                             │
- * │                 │ LRC      │ GPIO 13      │ Left/Right Clock (WS)                 │
+ * │                 │ LRC      │ GPIO 27      │ Left/Right Clock (WS)                 │
  * │                 │ GAIN     │ GND          │ 9dB gain (or leave floating for 12dB) │
  * ├─────────────────┼──────────┼──────────────┼───────────────────────────────────────┤
  * │ SSD1306 OLED    │ VCC      │ 3.3V         │ 3.3V power                            │
  * │                 │ GND      │ GND          │ Common ground                         │
- * │                 │ SDA      │ GPIO 18      │ I2C Data (or 21)                      │
- * │                 │ SCL      │ GPIO 19      │ I2C Clock (or 22)                     │
+ * │                 │ SDA      │ GPIO 4       │ I2C Data                              │
+ * │                 │ SCL      │ GPIO 15      │ I2C Clock                             │
  * ├─────────────────┼──────────┼──────────────┼───────────────────────────────────────┤
- * │ Button          │ Pin 1    │ GPIO 0 / 27  │ Internal Pull-Up enabled              │
- * │                 │ Pin 2    │ GND          │ Pressing connects pin to GND          │
+ * │ Button / LED    │ BOOT Pin │ GPIO 0       │ Onboard BOOT Button (Pull-Up)         │
+ * │                 │ LED Pin  │ GPIO 18      │ Status LED via 220 ohm resistor       │
+ * │                 │ Touch    │ GPIO 5       │ Optional Touch/Ext Button             │
  * └─────────────────┴──────────┴──────────────┴───────────────────────────────────────┘
  * =====================================================================================
  */
@@ -72,29 +73,30 @@ const char* ENROLLMENT_KEY  = "Pd1yEDahouFs43Pm8P-cCNWX5MGQKzYgm4-p0OO48os";
 // Firmware Version
 const char* FIRMWARE_VER    = "1.1.0";
 
-// 3. Hardware Pin Definitions:
-#define BUTTON_EXTERNAL_PIN 27   // External push button (GPIO 27 to GND)
+// 3. Hardware Pin Definitions (SKR Diagram / XiaoZhi Bread-Compact Standard):
+#define BUTTON_EXTERNAL_PIN 5    // Touch/external button (GPIO 5 to GND)
 #define BUTTON_BOOT_PIN     0    // ESP32 on-board BOOT button (GPIO 0 to GND)
+#define STATUS_LED_PIN      18   // LED via 220 ohm resistor
 
 // INMP441 Microphone (I2S Port 0)
 #define MIC_I2S_PORT    I2S_NUM_0
 #define MIC_BCLK_PIN    26
 #define MIC_WS_PIN      25
-#define MIC_DATA_PIN    33
+#define MIC_DATA_PIN    32
 
 // MAX98357A Amplifier (I2S Port 1)
 #define SPK_I2S_PORT    I2S_NUM_1
 #define SPK_BCLK_PIN    14
-#define SPK_WS_PIN      13
-#define SPK_DATA_PIN    22
+#define SPK_WS_PIN      27
+#define SPK_DATA_PIN    33
 
 // OLED Display (SSD1306 128x64)
 #define SCREEN_WIDTH    128
 #define SCREEN_HEIGHT   64
 #define OLED_RESET      -1
 #define OLED_I2C_ADDR   0x3C
-#define OLED_SDA_PIN    18
-#define OLED_SCL_PIN    19
+#define OLED_SDA_PIN    4
+#define OLED_SCL_PIN    15
 
 // Audio Parameters
 #define SAMPLE_RATE     16000

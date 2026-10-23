@@ -74,12 +74,12 @@
         <h2>Built for your board</h2>
         <table><tbody>
           <tr><th scope="row">Chip</th><td>Regular ESP32 DevKit (not S3)</td></tr>
-          <tr><th scope="row">Microphone</th><td id="mic-pins">INMP441 / GPIO 26, 25, 33</td></tr>
-          <tr><th scope="row">Speaker</th><td id="speaker-pins">MAX98357A / GPIO 14, 13, 22</td></tr>
-          <tr><th scope="row">OLED</th><td id="oled-pins">SSD1306 / SDA 18, SCL 19</td></tr>
-          <tr><th scope="row">Talk button</th><td id="button-pin">GPIO 27</td></tr>
+          <tr><th scope="row">Microphone</th><td id="mic-pins">INMP441 / SCK 26, WS 25, SD 32</td></tr>
+          <tr><th scope="row">Speaker</th><td id="speaker-pins">MAX98357A / DIN 33, BCLK 14, LRC 27</td></tr>
+          <tr><th scope="row">OLED</th><td id="oled-pins">SSD1306 / SDA 4, SCL 15</td></tr>
+          <tr><th scope="row">Talk button</th><td id="button-pin">Onboard BOOT (GPIO0)</td></tr>
         </tbody></table>
-        <p class="small-muted">These are the default MyVoice pin assignments. The published release metadata controls which profile is actually installed.</p>
+        <p class="small-muted">These are the GPIOs in your uploaded SKR wiring diagram. The published release metadata must confirm the XiaoZhi profile. LED: GPIO18 (function depends on firmware).</p>
       </div>
       <div class="info-card">
         <p class="kicker">AFTER FLASHING</p>

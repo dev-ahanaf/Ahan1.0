@@ -78,7 +78,7 @@ export const WebFlasher: React.FC<WebFlasherProps> = ({ onGoToFleet }) => {
                 Falcon AI - USB Web Flasher
               </h2>
               <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 rounded-full border border-amber-300 dark:border-amber-700">
-                ESP32 DevKit v1
+                SKR Diagram Standard
               </span>
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -297,28 +297,28 @@ export const WebFlasher: React.FC<WebFlasherProps> = ({ onGoToFleet }) => {
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4">
               <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center space-x-2">
                 <Cpu className="h-4 w-4 text-blue-500" />
-                <span>ESP32 DevKit v1 Wiring</span>
+                <span>SKR Wiring Diagram Pinout</span>
               </h4>
 
               <div className="text-xs space-y-2.5">
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span className="font-semibold text-slate-800 dark:text-slate-200 block">🎤 INMP441 Microphone</span>
-                  <span className="text-slate-500 font-mono text-[11px]">SCK: GPIO 26 | WS: GPIO 25 | SD: GPIO 33</span>
+                  <span className="text-slate-500 font-mono text-[11px]">SCK: GPIO 26 | WS: GPIO 25 | SD: GPIO 32</span>
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span className="font-semibold text-slate-800 dark:text-slate-200 block">🔊 MAX98357A Amplifier</span>
-                  <span className="text-slate-500 font-mono text-[11px]">BCLK: GPIO 14 | LRC: GPIO 13 | DIN: GPIO 22</span>
+                  <span className="text-slate-500 font-mono text-[11px]">DIN: GPIO 33 | BCLK: GPIO 14 | LRC: GPIO 27</span>
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
                   <span className="font-semibold text-slate-800 dark:text-slate-200 block">🖥️ SSD1306 0.96" OLED</span>
-                  <span className="text-slate-500 font-mono text-[11px]">SDA: GPIO 18 | SCL: GPIO 19 | Addr: 0x3C</span>
+                  <span className="text-slate-500 font-mono text-[11px]">SDA: GPIO 4 | SCL: GPIO 15 | Addr: 0x3C</span>
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 block">🔘 Push-to-Talk (Dual)</span>
-                  <span className="text-slate-500 font-mono text-[11px]">Onboard BOOT (GPIO 0) OR GPIO 27 to GND</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 block">💡 Status LED &amp; Talk Button</span>
+                  <span className="text-slate-500 font-mono text-[11px]">LED: GPIO 18 (220Ω) | Talk: Onboard BOOT (GPIO 0)</span>
                 </div>
               </div>
             </div>

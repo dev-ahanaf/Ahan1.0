@@ -12,27 +12,34 @@
 #define GMT_OFFSET_SEC (6 * 3600)
 #endif
 
-// Tactile push-to-talk button: Supports BOTH external button (GPIO 27) and onboard BOOT button (GPIO 0)
-static constexpr int BUTTON_PIN = 27;
+// ============================================================================
+// SKR WIRING DIAGRAM PINOUT (XiaoZhi Bread-Compact ESP32 Standard)
+// ============================================================================
+
+// Tactile push-to-talk button: Onboard BOOT button (GPIO 0) and optional touch/ext button (GPIO 5)
 static constexpr int BUTTON_BOOT_PIN = 0;
+static constexpr int BUTTON_PIN = 5;
 
 inline bool isVoiceButtonPressed() {
-    return (digitalRead(BUTTON_PIN) == LOW) || (digitalRead(BUTTON_BOOT_PIN) == LOW);
+    return (digitalRead(BUTTON_BOOT_PIN) == LOW) || (digitalRead(BUTTON_PIN) == LOW);
 }
+
+// Status LED (GPIO 18 via 220-ohm resistor)
+static constexpr int LED_PIN = 18;
 
 // INMP441 I2S Microphone pins (I2S0)
 static constexpr int MIC_BCLK = 26; // SCK
 static constexpr int MIC_WS   = 25; // WS / LRCL
-static constexpr int MIC_DATA = 33; // SD / DOUT
+static constexpr int MIC_DATA = 32; // SD / DOUT
 
 // MAX98357A I2S Amplifier pins (I2S1)
 static constexpr int SPK_BCLK = 14; // BCLK
-static constexpr int SPK_WS   = 13; // LRC / WS
-static constexpr int SPK_DATA = 22; // DIN
+static constexpr int SPK_WS   = 27; // LRC / WS
+static constexpr int SPK_DATA = 33; // DIN
 
 // SSD1306 128x64 OLED Display pins (I2C)
-static constexpr int OLED_SDA = 18;
-static constexpr int OLED_SCL = 19;
+static constexpr int OLED_SDA = 4;
+static constexpr int OLED_SCL = 15;
 static constexpr uint8_t OLED_I2C_ADDR = 0x3C;
 static constexpr int SCREEN_WIDTH = 128;
 static constexpr int SCREEN_HEIGHT = 64;
