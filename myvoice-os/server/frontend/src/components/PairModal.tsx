@@ -2,19 +2,24 @@ import React, { useState } from 'react';
 import { X, KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { claimDevice } from '../api';
 
+import { Device } from '../types';
+
 interface PairModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPaired: () => void;
+  devices?: Device[];
 }
 
-export const PairModal: React.FC<PairModalProps> = ({ isOpen, onClose, onPaired }) => {
+export const PairModal: React.FC<PairModalProps> = ({ isOpen, onClose, onPaired, devices = [] }) => {
   const [code, setCode] = useState('');
   const [name, setName] = useState('My Voice Assistant');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const pendingDevices = devices.filter((d) => !d.paired && d.pair_code);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +59,35 @@ export const PairModal: React.FC<PairModalProps> = ({ isOpen, onClose, onPaired 
             <p className="text-xs text-slate-500">Claim your ESP32 device identity</p>
           </div>
         </div>
+
+        {/* Auto-detected pending hardware */}
+        {pendingDevices.length > 0 && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs space-y-2">
+            <p className="font-semibold flex items-center space-x-1.5">
+              <span>⚡ Active Unpaired ESP32 Found:</span>
+            </p>
+            {pendingDevices.map((d) => (
+              <div
+                key={d.id}
+                className="flex items-center justify-between bg-white dark:bg-slate-900 p-2 rounded-lg border border-amber-200 dark:border-amber-800"
+              >
+                <span className="font-mono text-[11px]">
+                  {d.id} · Code: <strong className="text-amber-600 dark:text-amber-400 text-sm">{d.pair_code}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCode(d.pair_code || '');
+                    setName(d.name || 'Falcon AI ESP32');
+                  }}
+                  className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-md text-[11px] transition cursor-pointer"
+                >
+                  Use Code
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="mb-5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
           <p className="font-semibold text-slate-800 dark:text-slate-200">How to get your 6-digit code:</p>

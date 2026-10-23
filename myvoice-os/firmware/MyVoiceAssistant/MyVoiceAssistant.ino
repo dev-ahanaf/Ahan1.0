@@ -437,7 +437,7 @@ void connectWebSocket() {
 // =====================================================================================
 
 bool bootstrapDevice() {
-    if (deviceToken.length() > 0) return true;
+    if (isPaired) return true;
 
     HTTPClient http;
     String url = String(SERVER_BASE_URL) + "/api/device/bootstrap";
@@ -493,6 +493,13 @@ void checkPairStatus() {
         String body = http.getString();
         DynamicJsonDocument doc(512);
         deserializeJson(doc, body);
+
+        String renewedCode = doc["pair_code"].as<String>();
+        if (renewedCode.length() > 0) {
+            pairCode = renewedCode;
+            prefs.putString("paircode", pairCode);
+            currentState = STATE_PAIRING;
+        }
 
         if (doc["paired"].as<bool>()) {
             isPaired = true;

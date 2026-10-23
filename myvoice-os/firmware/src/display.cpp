@@ -120,10 +120,10 @@ void DisplayManager::renderPairingCode() {
     
     display.setTextSize(2);
     display.setCursor(28, 22);
-    if (pairCode.length() == 6) {
+    if (pairCode.length() > 0) {
         display.println(pairCode);
     } else {
-        display.println("------");
+        display.println("WAIT...");
     }
     
     display.setTextSize(1);

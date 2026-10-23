@@ -303,6 +303,7 @@ export const App: React.FC = () => {
         isOpen={isPairOpen}
         onClose={() => setIsPairOpen(false)}
         onPaired={loadDevices}
+        devices={devices}
       />
 
       {activeSettingsDevice && (

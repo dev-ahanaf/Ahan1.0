@@ -34,6 +34,7 @@ export interface Device {
   online: boolean;
   tools_enabled?: string;
   agent_id?: string | null;
+  pair_code?: string | null;
 }
 
 export interface DeviceSettingsPayload {

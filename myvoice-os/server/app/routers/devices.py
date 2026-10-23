@@ -20,13 +20,17 @@ def utc_now() -> datetime:
 @router.get("/status")
 def device_status(device: Device = Depends(device_auth), db: Session = Depends(get_db)):
     """Device status check and pairing code renewal."""
+    from app.routers.pairing import ACTIVE_PAIR_CODES
     code = None
-    if not device.paired and (not device.pair_expires or datetime.fromisoformat(device.pair_expires) < utc_now()):
-        import secrets
-        code = str(secrets.randbelow(900000) + 100000)
-        device.pair_hash = code_digest(code)
-        device.pair_expires = (utc_now() + PAIR_DURATION).isoformat()
-        db.commit()
+    if not device.paired:
+        code = ACTIVE_PAIR_CODES.get(device.id)
+        if not code or not device.pair_expires or datetime.fromisoformat(device.pair_expires) < utc_now():
+            import secrets
+            code = str(secrets.randbelow(900000) + 100000)
+            ACTIVE_PAIR_CODES[device.id] = code
+            device.pair_hash = code_digest(code)
+            device.pair_expires = (utc_now() + PAIR_DURATION).isoformat()
+            db.commit()
     return {
         "paired": bool(device.paired),
         "name": device.name,

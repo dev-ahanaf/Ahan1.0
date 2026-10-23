@@ -50,6 +50,11 @@ void setup() {
     NetClient::instance().syncNtpTime();
 
     if (!ConfigStore::instance().isPaired()) {
+        String savedCode = ConfigStore::instance().getPairCode();
+        if (savedCode.length() > 0) {
+            DisplayManager::instance().setPairCode(savedCode);
+            DisplayManager::instance().setState(DisplayState::PAIRING_CODE);
+        }
         NetClient::instance().bootstrap();
         NetClient::instance().pollStatus();
     } else {

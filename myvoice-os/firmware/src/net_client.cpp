@@ -20,7 +20,7 @@ void NetClient::addAuthHeaders(HTTPClient &http) {
 }
 
 bool NetClient::bootstrap() {
-    if (ConfigStore::instance().getDeviceToken().length() > 0) return true;
+    if (ConfigStore::instance().isPaired()) return true;
 
     DisplayManager::instance().setState(DisplayState::CONNECTING_SERVER);
     HTTPClient http;
@@ -64,7 +64,7 @@ bool NetClient::bootstrap() {
     DisplayManager::instance().setState(DisplayState::PAIRING_CODE);
 
     Serial.println("\n=========================================");
-    Serial.printf("  MYVOICE PAIRING CODE: %s\n", pairCode.c_str());
+    Serial.printf("  FALCON AI PAIRING CODE: %s\n", pairCode.c_str());
     Serial.println("  Enter in web dashboard within 10 minutes");
     Serial.println("=========================================\n");
 
@@ -84,9 +84,10 @@ bool NetClient::pollStatus() {
     http.end();
 
     if (status == 401) {
-        Serial.println("[Net] Device token rejected or revoked");
-        DisplayManager::instance().setErrorMessage("Token Revoked");
-        DisplayManager::instance().setState(DisplayState::ERROR_STATE);
+        Serial.println("[Net] Device token rejected or revoked. Re-bootstrapping...");
+        ConfigStore::instance().setDeviceToken("");
+        ConfigStore::instance().setPairCode("");
+        bootstrap();
         return false;
     }
     if (status != 200) {
@@ -103,7 +104,13 @@ bool NetClient::pollStatus() {
         ConfigStore::instance().setPairCode(renewedCode);
         DisplayManager::instance().setPairCode(renewedCode);
         DisplayManager::instance().setState(DisplayState::PAIRING_CODE);
-        Serial.printf("[Net] Renewed Pairing Code: %s\n", renewedCode.c_str());
+        Serial.printf("[Net] Active Pairing Code: %s\n", renewedCode.c_str());
+    } else if (!isPaired) {
+        String savedCode = ConfigStore::instance().getPairCode();
+        if (savedCode.length() > 0) {
+            DisplayManager::instance().setPairCode(savedCode);
+            DisplayManager::instance().setState(DisplayState::PAIRING_CODE);
+        }
     }
 
     if (isPaired && !ConfigStore::instance().isPaired()) {

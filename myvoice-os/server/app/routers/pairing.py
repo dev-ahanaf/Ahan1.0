@@ -19,6 +19,9 @@ from app.auth import (
 router = APIRouter(prefix="/api", tags=["Pairing"])
 PAIR_DURATION = timedelta(minutes=10)
 
+# In-memory lookup for active unhashed pairing codes for unpaired devices
+ACTIVE_PAIR_CODES: dict[str, str] = {}
+
 def utc_now() -> datetime:
     """Current UTC datetime."""
     return datetime.now(timezone.utc)
@@ -46,6 +49,7 @@ def bootstrap(
         )
     
     code = new_code()
+    ACTIVE_PAIR_CODES[device_id] = code
     token = secrets.token_urlsafe(32)
     expires_at = (utc_now() + PAIR_DURATION).isoformat()
     now_iso = utc_now().isoformat()
@@ -105,6 +109,7 @@ def claim(
     device.name = body.name
     device.pair_hash = None
     device.pair_expires = None
+    ACTIVE_PAIR_CODES.pop(device.id, None)
     db.commit()
     
     return {

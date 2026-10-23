@@ -28,11 +28,24 @@ def is_device_online(last_seen_iso: str | None) -> bool:
 @router.get("/devices")
 def list_devices(_: bool = Depends(admin), db: Session = Depends(get_db)):
     """List all registered devices with online status and telemetry."""
+    from datetime import timedelta
+    from app.routers.pairing import ACTIVE_PAIR_CODES
+    from app.auth import code_digest
     rows = db.query(Device).order_by(Device.created_at.desc()).all()
     device_list = []
+    now = datetime.now(timezone.utc)
     for r in rows:
         d = r.to_dict()
         d["online"] = is_device_online(r.last_seen)
+        if not r.paired:
+            code = ACTIVE_PAIR_CODES.get(r.id)
+            if not code or not r.pair_expires or datetime.fromisoformat(r.pair_expires) < now:
+                code = str(secrets.randbelow(900000) + 100000)
+                ACTIVE_PAIR_CODES[r.id] = code
+                r.pair_hash = code_digest(code)
+                r.pair_expires = (now + timedelta(minutes=15)).isoformat()
+                db.commit()
+            d["pair_code"] = code
         device_list.append(d)
     return {"devices": device_list}
 
