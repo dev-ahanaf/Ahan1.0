@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#091122" />
+  <meta name="description" content="Falcon AI - install your personal ESP32 voice assistant firmware right from the browser." />
+  <title>Install Firmware | Falcon AI</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar wrap">
+    <a class="brand" href="./" aria-label="Falcon AI firmware installer home">
+      <span class="brand-mark" aria-hidden="true">F</span><span>FALCON<span class="light">AI</span></span>
+    </a>
+    <span class="section-tag"><span class="live-dot"></span> FIRMWARE INSTALLER</span>
+    <a class="docs-link" href="https://github.com/78/xiaozhi-esp32" target="_blank" rel="noopener">Firmware Source ↗</a>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow"><span class="star">✦</span> MADE FOR YOUR ESP32</div>
+      <h1>Bring your <em>Falcon AI</em><br />to life.</h1>
+      <p class="lead">Install your own voice assistant firmware directly from Chrome or Edge. No Arduino IDE required on the device owner's computer.</p>
+      <div class="chips"><span>ESP32-WROOM-32</span><span>INMP441 + MAX98357A</span><span>SSD1306 OLED</span></div>
+    </section>
+
+    <section class="main-grid" aria-label="Installer and guidance">
+      <div class="primary-card">
+        <div class="card-title-row">
+          <div class="icon-tile" aria-hidden="true">⚡</div>
+          <div><p class="kicker">STEP 01 · USB FLASH</p><h2>Install Falcon AI</h2></div>
+        </div>
+
+        <div class="release-box">
+          <span class="release-icon" aria-hidden="true">◈</span>
+          <div class="release-copy"><strong id="firmware-name">Falcon AI ESP32</strong><span id="firmware-details">Checking firmware availability…</span></div>
+          <span id="firmware-badge" class="state-badge pending">CHECKING</span>
+        </div>
+
+        <div id="ready-container" hidden>
+          <p class="small-muted install-note">Before proceeding, confirm your ESP32 board uses the <strong id="board-profile">MyVoice</strong> wiring profile and has sufficient flash memory.</p>
+          <label class="ack"><input id="confirm-wiring" type="checkbox" /> <span>I confirmed the board, GPIO wiring and firmware version.</span></label>
+          <div id="action-gated" class="action-gated">
+            <span class="button-substitute" aria-disabled="true">Confirm device compatibility to install</span>
+          </div>
+          <div id="action-live" hidden>
+            <esp-web-install-button id="esp-install" manifest="./firmware/manifest.json">
+              <button type="button" class="install-btn" slot="activate">⚡ &nbsp; Connect &amp; Install Firmware <span aria-hidden="true">→</span></button>
+              <span class="error-hint" slot="unsupported">This browser does not support the required serial connection. Please use desktop Chrome or Edge.</span>
+              <span class="error-hint" slot="not-allowed">Web flashing requires HTTPS or localhost. Please open the secure version of this site.</span>
+            </esp-web-install-button>
+          </div>
+        </div>
+        <div id="blocked-container" class="blocked" role="status" aria-live="polite">Checking for a published, compatible firmware image…</div>
+        <p class="secure-line">🔒 &nbsp; USB flashing happens inside your browser. No USB access is requested until you click Install.</p>
+        <a id="download-firmware" class="download-link" href="#" download hidden>Download firmware .bin instead ↗</a>
+      </div>
+
+      <aside class="steps-card">
+        <p class="kicker">BEFORE YOU START</p><h2>3 simple steps</h2>
+        <div class="step"><span class="stepnum">01</span><div><h3>Connect your ESP32</h3><p>Use a data-capable USB cable and connect the board to your computer.</p></div></div>
+        <div class="step"><span class="stepnum">02</span><div><h3>Choose the serial port</h3><p>Click Install, select your ESP32 serial port, then allow access.</p></div></div>
+        <div class="step"><span class="stepnum">03</span><div><h3>Flash &amp; configure</h3><p>Install the firmware. Follow the OLED / serial instructions to configure Wi-Fi and pair to your own server.</p></div></div>
+        <div class="tip"><span aria-hidden="true">💡</span> Not showing a port? Try another USB data cable, CH340/CP210x driver, or hold BOOT while connecting if your board requires it.</div>
+      </aside>
+    </section>
+
+    <section class="detail-grid">
+      <div class="info-card">
+        <p class="kicker">HARDWARE PROFILE</p>
+        <h2>Built for your board</h2>
+        <table><tbody>
+          <tr><th scope="row">Chip</th><td>Regular ESP32 DevKit (not S3)</td></tr>
+          <tr><th scope="row">Microphone</th><td id="mic-pins">INMP441 / GPIO 26, 25, 33</td></tr>
+          <tr><th scope="row">Speaker</th><td id="speaker-pins">MAX98357A / GPIO 14, 13, 22</td></tr>
+          <tr><th scope="row">OLED</th><td id="oled-pins">SSD1306 / SDA 18, SCL 19</td></tr>
+          <tr><th scope="row">Talk button</th><td id="button-pin">GPIO 27</td></tr>
+        </tbody></table>
+        <p class="small-muted">These are the default MyVoice pin assignments. The published release metadata controls which profile is actually installed.</p>
+      </div>
+      <div class="info-card">
+        <p class="kicker">AFTER FLASHING</p>
+        <h2>Your server. Your assistant.</h2>
+        <div class="after-item"><span>①</span><p>Connect the device to your <strong>2.4 GHz Wi-Fi</strong> using the firmware's supported provisioning flow.</p></div>
+        <div class="after-item"><span>②</span><p>Make sure the configured <strong>OTA / WebSocket server</strong> is reachable from the device.</p></div>
+        <div class="after-item"><span>③</span><p>Pair the ESP32 in <strong>your own Falcon AI console</strong> and assign an AI agent.</p></div>
+        <p class="small-muted">Wi-Fi provisioning and pairing must actually be implemented in the firmware and server; web flashing alone does not provide them.</p>
+      </div>
+    </section>
+    <div class="warning" role="note"><strong>Important:</strong> Flashing can erase existing firmware, Wi-Fi settings and saved data. Back up anything you need. The website checks the ESP32 chip family; you must still verify the pinout and installed flash size.</div>
+  </main>
+  <footer class="wrap"><span>© Falcon AI · Independent voice assistant project</span><span>Powered by <a href="https://esphome.github.io/esp-web-tools/" target="_blank" rel="noopener">ESP Web Tools</a></span></footer>
+</body>
+</html>

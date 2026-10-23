@@ -1,0 +1,11 @@
+{
+  "chip": "ESP32",
+  "board": "ESP32 DevKit / WROOM-32",
+  "profile": "myvoice",
+  "flash_size": "4MB",
+  "image": "falcon-ai-esp32.bin",
+  "version": "1.2.0",
+  "size_bytes": 1258736,
+  "sha256": "83d88b9c5739b0170efb8234274fb41f05b733a756f5f250ddb62bf3556c2333",
+  "published_utc": "2026-10-23T18:20:44.042774+00:00"
+}

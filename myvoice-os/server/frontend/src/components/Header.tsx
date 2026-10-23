@@ -11,7 +11,8 @@ import {
   Moon,
   User,
   RefreshCw,
-  Radio
+  Radio,
+  Usb
 } from 'lucide-react';
 
 
@@ -19,8 +20,8 @@ interface HeaderProps {
   onRefresh: () => void;
   onOpenPair: () => void;
   loading: boolean;
-  activeTab: 'fleet' | 'agents' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system';
-  onSelectTab: (tab: 'fleet' | 'agents' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system') => void;
+  activeTab: 'fleet' | 'agents' | 'flasher' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system';
+  onSelectTab: (tab: 'fleet' | 'agents' | 'flasher' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system') => void;
   darkMode: boolean;
   onToggleDarkMode: () => void;
 }
@@ -63,6 +64,18 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Radio className="h-3.5 w-3.5 text-[#1677ff]" />
             <span>Devices</span>
+          </button>
+
+          <button
+            onClick={() => onSelectTab('flasher')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              activeTab === 'flasher'
+                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Usb className="h-3.5 w-3.5 text-amber-500" />
+            <span>Web Flasher</span>
           </button>
 
           <button

@@ -1,0 +1,18 @@
+FALCON AI ESP32 PERSONAL FIRMWARE - QUICK START
+
+1) Extract this ZIP beside your cloned xiaozhi-esp32 directory.
+2) Edit the IP address in the command below to your computer's LOCAL IP.
+3) Run:
+
+python3 apply_falcon.py --repo ../xiaozhi-esp32 --profile myvoice --flash-size 4MB --ota-url http://192.168.1.100:8002/xiaozhi/ota/
+
+4) After activating the ESP-IDF environment:
+
+cd ../xiaozhi-esp32
+python scripts/build.py falcon-ai-esp32 --language en-US --wake-word disabled
+idf.py -p YOUR_SERIAL_PORT flash monitor
+
+Never flash until GPIO pins and actual ESP32 flash capacity are checked.
+For exact wiring + limits read README_BN.md.
+
+This is buildable-source customization, NOT a precompiled/physically-tested .bin.

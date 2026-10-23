@@ -36,7 +36,7 @@ app = FastAPI(title="Falcon AI Platform", version="1.2.0", lifespan=lifespan)
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
@@ -50,6 +50,18 @@ app.include_router(agents_router)
 app.include_router(ws_router)
 app.include_router(ota_router)
 
+
+# Web Flasher static routes
+FLASH_DIR = STATIC_DIR / "flash"
+if not FLASH_DIR.exists():
+    FLASH_DIR = ROOT_DIR.parent / "FalconAI_WebFlasher" / "site"
+
+if FLASH_DIR.exists():
+    app.mount("/flash", StaticFiles(directory=str(FLASH_DIR), html=True), name="flash")
+
+FIRMWARE_DIR = STATIC_DIR / "firmware"
+if FIRMWARE_DIR.exists():
+    app.mount("/firmware", StaticFiles(directory=str(FIRMWARE_DIR)), name="firmware")
 
 # Dashboard web routes
 @app.get("/")
@@ -80,3 +92,4 @@ def icon_view():
 
 if (STATIC_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
+

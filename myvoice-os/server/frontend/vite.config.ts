@@ -14,6 +14,14 @@ export default defineConfig({
         target: process.env.SERVER_URL || 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      '/flash': {
+        target: process.env.SERVER_URL || 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/firmware': {
+        target: process.env.SERVER_URL || 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     },
   },
 });

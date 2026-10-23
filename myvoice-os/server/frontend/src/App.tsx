@@ -16,13 +16,15 @@ import { TimersAndAlarms } from './components/TimersAndAlarms';
 import { OTAUpdates } from './components/OTAUpdates';
 import { SystemSettings } from './components/SystemSettings';
 import { AgentsManager } from './components/AgentsManager';
+import { WebFlasher } from './components/WebFlasher';
 import {
   Search,
   ChevronDown,
   AlertCircle,
   Activity,
   Radio,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -32,7 +34,7 @@ export const App: React.FC = () => {
   const [isPairOpen, setIsPairOpen] = useState(false);
   const [activeSettingsDevice, setActiveSettingsDevice] = useState<Device | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'fleet' | 'agents' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system'
+    'fleet' | 'agents' | 'flasher' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system'
   >('fleet');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,8 +131,17 @@ export const App: React.FC = () => {
                 </div>
 
                 <button
+                  onClick={() => setActiveTab('flasher')}
+                  className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs shadow-xs hover:shadow transition shrink-0 cursor-pointer"
+                  title="Flash ESP32 over USB Web Serial"
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  <span>Flash USB</span>
+                </button>
+
+                <button
                   onClick={() => setIsPairOpen(true)}
-                  className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#1677ff] hover:bg-blue-600 text-white font-medium text-xs shadow-xs hover:shadow transition shrink-0"
+                  className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#1677ff] hover:bg-blue-600 text-white font-medium text-xs shadow-xs hover:shadow transition shrink-0 cursor-pointer"
                 >
                   <span>+ Add Device</span>
                   <ChevronDown className="h-3.5 w-3.5 opacity-80" />
@@ -215,6 +226,13 @@ export const App: React.FC = () => {
         {activeTab === 'agents' && (
           <div className="space-y-4">
             <AgentsManager devices={devices} onRefreshDevices={loadDevices} />
+          </div>
+        )}
+
+        {/* Tab: USB Web Flasher (ESP32 DevKit v1) */}
+        {activeTab === 'flasher' && (
+          <div className="space-y-4">
+            <WebFlasher onGoToFleet={() => setActiveTab('fleet')} />
           </div>
         )}
 
