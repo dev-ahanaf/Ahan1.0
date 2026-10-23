@@ -184,6 +184,8 @@ def get_providers(_: bool = Depends(admin), db: Session = Depends(get_db)):
 
     return {
         "available_asr": [
+            {"id": "gemini", "name": "Google Gemini ASR (Recommended)", "description": "Direct multimodal speech recognition via Gemini API"},
+            {"id": "groq", "name": "Groq Whisper (Ultra-Fast)", "description": "High-speed Whisper cloud transcription"},
             {"id": "openai", "name": "OpenAI Whisper", "description": "Cloud neural speech recognition"},
             {"id": "faster-whisper", "name": "Faster-Whisper (Local)", "description": "CTranslate2 local transcription"},
             {"id": "mock", "name": "Mock ASR", "description": "Deterministic testing backend"}
