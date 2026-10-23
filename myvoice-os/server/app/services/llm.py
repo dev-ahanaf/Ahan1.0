@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import httpx
-from app.config import OPENAI_API_KEY, AI_MODEL
+from app.config import OPENAI_API_KEY, GEMINI_API_KEY, AI_MODEL
 from app.services.weather import fetch_weather
 from app.services.search import search_brave
 
@@ -24,9 +24,24 @@ def fallback_profile() -> dict:
     }
 
 async def ask_llm(prompt: str) -> str:
-    """Send prompt to OpenAI Chat Completion model."""
+    """Send prompt to Gemini or OpenAI Chat Completion model."""
+    if GEMINI_API_KEY:
+        from app.services.providers.llm import GeminiLLMProvider
+        provider = GeminiLLMProvider(api_key=GEMINI_API_KEY, model="gemini-2.5-flash")
+        chunks = []
+        try:
+            async for chunk in provider.stream_chat([
+                {"role": "system", "content": "You are a concise, friendly voice assistant. Respond in the user's language. Keep responses under 60 words."},
+                {"role": "user", "content": prompt}
+            ]):
+                chunks.append(chunk)
+            return "".join(chunks).strip() or "I don't have an answer yet."
+        except Exception as e:
+            return f"Error contacting Gemini: {str(e)}"
+
     if not OPENAI_API_KEY:
-        return "General AI questions require OPENAI_API_KEY. Clock and weather commands work without it."
+        return "Configure your GEMINI_API_KEY or OPENAI_API_KEY in the Falcon Console settings to enable AI answers."
+
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.post(
             "https://api.openai.com/v1/chat/completions",

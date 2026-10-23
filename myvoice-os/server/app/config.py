@@ -9,8 +9,9 @@ load_dotenv(ROOT_DIR / ".env")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 ENROLLMENT_KEY = os.getenv("ENROLLMENT_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 BRAVE_SEARCH_API_KEY = os.getenv("BRAVE_SEARCH_API_KEY", "")
-AI_MODEL = os.getenv("AI_MODEL", "gpt-4.1-mini")
+AI_MODEL = os.getenv("AI_MODEL", "gemini-2.5-flash")
 if os.getenv("VERCEL"):
     DATABASE_PATH = os.getenv("DATABASE_PATH", "/tmp/myvoice.db")
 else:
