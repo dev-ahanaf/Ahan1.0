@@ -1,0 +1,31 @@
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python Virtual Environments & Cache
+.venv/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+
+# Node.js Dependencies & Builds
+**/node_modules/
+**/dist/
+
+# PlatformIO & Embedded Build Artifacts
+**/.pio/
+
+# Secrets, Environment & Credentials
+.env
+**/.env
+**/secrets.h
+**/.simulator_creds.json
+
+# Databases & Runtime State
+*.db
+*.db-shm
+*.db-wal
+*.log

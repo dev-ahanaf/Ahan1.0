@@ -1,0 +1,81 @@
+name: MyVoice OS CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    name: Backend Pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Run Backend Tests
+        run: |
+          PYTHONPATH=server pytest server/tests -v
+
+  build-frontend:
+    name: Frontend TypeScript & Vite Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: server/frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: server/frontend
+        run: npm ci
+
+      - name: Build Production Bundle
+        working-directory: server/frontend
+        run: npm run build
+
+  build-firmware:
+    name: ESP32 Firmware Build (PlatformIO)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python for PlatformIO
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install PlatformIO Core
+        run: |
+          pip install --upgrade platformio
+
+      - name: Copy Sample Secrets
+        run: |
+          cp firmware/include/secrets.h.example firmware/include/secrets.h
+
+      - name: Build Firmware Binary
+        working-directory: firmware
+        run: pio run

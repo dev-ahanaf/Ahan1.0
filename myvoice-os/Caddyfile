@@ -1,0 +1,16 @@
+{$DOMAIN:localhost} {
+    encode gzip zstd
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-XSS-Protection "1; mode=block"
+        -Server
+    }
+
+    reverse_proxy app:8000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Real-IP {remote_host}
+    }
+}

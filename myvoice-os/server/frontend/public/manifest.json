@@ -1,0 +1,16 @@
+{
+  "name": "MyVoice OS Studio",
+  "short_name": "MyVoice OS",
+  "description": "XiaoZhi-inspired AI Voice Assistant and Device Management Studio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

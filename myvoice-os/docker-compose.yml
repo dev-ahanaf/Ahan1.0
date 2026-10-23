@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: myvoice-os:1.0.0-rc1
+    restart: unless-stopped
+    env_file:
+      - server/.env
+    environment:
+      - DATABASE_PATH=/app/data/myvoice.db
+      - TESTING=0
+    volumes:
+      - app-data:/app/data
+      - app-firmware:/app/firmware_catalog
+    networks:
+      - myvoice-net
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - myvoice-net
+    depends_on:
+      - app
+
+volumes:
+  app-data:
+  app-firmware:
+  caddy-data:
+  caddy-config:
+
+networks:
+  myvoice-net:
+    driver: bridge

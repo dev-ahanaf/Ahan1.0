@@ -1,0 +1,11 @@
+.env
+**/.env
+**/secrets.h
+**/.pio/
+**/__pycache__/
+**/.pytest_cache/
+*.db
+*.db-shm
+*.db-wal
+*.pyc
+.DS_Store
