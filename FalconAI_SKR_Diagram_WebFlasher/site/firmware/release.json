@@ -4,8 +4,8 @@
   "profile": "xiaozhi",
   "flash_size": "4MB",
   "image": "falcon-ai-esp32.bin",
-  "version": "1.2.1",
-  "size_bytes": 1259024,
-  "sha256": "f16eb6ee74a830ff48da49d9ce74853c4eacd0d27c01f0518e3a2bf43c0b271f",
-  "published_utc": "2026-10-23T19:10:20.179575+00:00"
+  "version": "1.2.2",
+  "size_bytes": 1259008,
+  "sha256": "dd9cb36ef1c0291893b76bd469c07b80c2b2feb2159d0c3682e03a385dce8838",
+  "published_utc": "2026-10-23T19:30:37.961710+00:00"
 }

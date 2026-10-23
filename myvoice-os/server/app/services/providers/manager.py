@@ -4,7 +4,10 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.models import Device, SystemSetting
 from app.services.providers.base import ASRProvider, LLMProvider, TTSProvider
-from app.services.providers.asr import OpenAIWhisperProvider, FasterWhisperProvider, MockASRProvider
+from app.services.providers.asr import (
+    OpenAIWhisperProvider, FasterWhisperProvider, MockASRProvider,
+    GroqWhisperProvider, GeminiASRProvider
+)
 from app.services.providers.llm import (
     OpenAILLMProvider, GeminiLLMProvider, OpenAICompatibleProvider, OllamaProvider, MockLLMProvider
 )
@@ -38,18 +41,43 @@ class ProviderManager:
 
     @classmethod
     def resolve_asr(cls, db: Session, device: Optional[Device] = None) -> ASRProvider:
-        """Resolve effective ASR provider for device or global fallback."""
+        """Resolve effective ASR provider for device or global fallback with auto-detection."""
         provider_name = (device.asr_provider if device and device.asr_provider else None)
         if not provider_name:
-            provider_name = cls.get_setting(db, "default_asr_provider", "openai").lower()
+            provider_name = cls.get_setting(db, "default_asr_provider", "auto").lower()
+
+        openai_key = cls.get_setting(db, "openai_api_key", os.getenv("OPENAI_API_KEY", ""))
+        gemini_key = cls.get_setting(db, "gemini_api_key", os.getenv("GEMINI_API_KEY", ""))
+        groq_key = cls.get_setting(db, "groq_api_key", os.getenv("GROQ_API_KEY", ""))
+
+        if provider_name == "groq" or (provider_name == "auto" and groq_key):
+            if groq_key:
+                return GroqWhisperProvider(api_key=groq_key)
+
+        if provider_name == "gemini" or (provider_name == "auto" and gemini_key):
+            if gemini_key:
+                return GeminiASRProvider(api_key=gemini_key)
+
+        if provider_name == "openai" or (provider_name == "auto" and openai_key):
+            if openai_key:
+                return OpenAIWhisperProvider(api_key=openai_key)
+
+        if provider_name in ("faster-whisper", "faster_whisper"):
+            return FasterWhisperProvider()
 
         if provider_name == "mock":
             return MockASRProvider()
-        elif provider_name in ("faster-whisper", "faster_whisper"):
-            return FasterWhisperProvider()
-        else:
-            api_key = cls.get_setting(db, "openai_api_key", os.getenv("OPENAI_API_KEY", ""))
-            return OpenAIWhisperProvider(api_key=api_key)
+
+        # If explicit provider configured with key
+        if provider_name == "groq":
+            return GroqWhisperProvider(api_key=groq_key)
+        if provider_name == "gemini":
+            return GeminiASRProvider(api_key=gemini_key)
+        if provider_name == "openai":
+            return OpenAIWhisperProvider(api_key=openai_key)
+
+        # Fallback to MockASR with guidance
+        return MockASRProvider()
 
     @classmethod
     def resolve_llm(cls, db: Session, device: Optional[Device] = None) -> tuple[LLMProvider, str]:

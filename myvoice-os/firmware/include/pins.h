@@ -16,12 +16,19 @@
 // SKR WIRING DIAGRAM PINOUT (XiaoZhi Bread-Compact ESP32 Standard)
 // ============================================================================
 
-// Tactile push-to-talk button: Onboard BOOT button (GPIO 0) and optional touch/ext button (GPIO 5)
+// Tactile push-to-talk button: Onboard BOOT button (GPIO 0 has built-in hardware pullup on ESP32)
 static constexpr int BUTTON_BOOT_PIN = 0;
-static constexpr int BUTTON_PIN = 5;
+// Optional external button pin (set to -1 when not physically wired to prevent floating auto-triggers)
+static constexpr int BUTTON_PIN = -1;
 
 inline bool isVoiceButtonPressed() {
-    return (digitalRead(BUTTON_BOOT_PIN) == LOW) || (digitalRead(BUTTON_PIN) == LOW);
+    if (digitalRead(BUTTON_BOOT_PIN) == LOW) {
+        return true;
+    }
+    if (BUTTON_PIN >= 0 && digitalRead(BUTTON_PIN) == LOW) {
+        return true;
+    }
+    return false;
 }
 
 // Status LED (GPIO 18 via 220-ohm resistor)

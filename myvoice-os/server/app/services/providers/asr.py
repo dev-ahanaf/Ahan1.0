@@ -94,8 +94,105 @@ class FasterWhisperProvider(ASRProvider):
             }
 
 
+class GroqWhisperProvider(ASRProvider):
+    """Ultra-fast Whisper transcription using Groq Cloud API."""
+
+    def __init__(self, api_key: Optional[str] = None, model: str = "whisper-large-v3-turbo"):
+        self.api_key = api_key or os.getenv("GROQ_API_KEY", "")
+        self.model = model
+
+    async def transcribe(self, audio_bytes: bytes, language: str = "en") -> str:
+        if not self.api_key:
+            raise ValueError("Groq API key is missing. Configure GROQ_API_KEY in server settings.")
+
+        if not audio_bytes.startswith(b"RIFF"):
+            wav_data = pcm16_to_wav(audio_bytes, sample_rate=16000, channels=1)
+        else:
+            wav_data = audio_bytes
+
+        data = {"model": self.model}
+        if language and language not in ("auto", "en-US", "en-GB"):
+            data["language"] = language[:2]
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
+                files={"file": ("speech.wav", wav_data, "audio/wav")},
+                data=data
+            )
+            resp.raise_for_status()
+            payload = resp.json()
+            return payload.get("text", "").strip()
+
+    async def health_check(self) -> Dict[str, Any]:
+        if not self.api_key:
+            return {"ok": False, "provider": "groq", "error": "Groq API key not configured"}
+        return {"ok": True, "provider": "groq", "model": self.model}
+
+
+class GeminiASRProvider(ASRProvider):
+    """Speech transcription using Google Gemini multimodal audio recognition."""
+
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-1.5-flash"):
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
+        self.model = model
+
+    async def transcribe(self, audio_bytes: bytes, language: str = "en") -> str:
+        if not self.api_key:
+            raise ValueError("Gemini API key is missing. Configure GEMINI_API_KEY in server settings.")
+
+        import base64
+        if not audio_bytes.startswith(b"RIFF"):
+            wav_data = pcm16_to_wav(audio_bytes, sample_rate=16000, channels=1)
+        else:
+            wav_data = audio_bytes
+
+        b64_audio = base64.b64encode(wav_data).decode("utf-8")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        prompt = (
+            f"Transcribe this user speech audio verbatim. "
+            f"Language: {language}. "
+            f"Return ONLY the exact transcribed text words, with no explanations, no quotes, and no extra text."
+        )
+
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": prompt},
+                    {
+                        "inline_data": {
+                            "mime_type": "audio/wav",
+                            "data": b64_audio
+                        }
+                    }
+                ]
+            }],
+            "generationConfig": {
+                "temperature": 0.0,
+                "maxOutputTokens": 200
+            }
+        }
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(url, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+            candidates = data.get("candidates", [])
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts", [])
+                if parts:
+                    return parts[0].get("text", "").strip()
+            return ""
+
+    async def health_check(self) -> Dict[str, Any]:
+        if not self.api_key:
+            return {"ok": False, "provider": "gemini", "error": "Gemini API key not configured"}
+        return {"ok": True, "provider": "gemini", "model": self.model}
+
+
 class MockASRProvider(ASRProvider):
-    """Deterministic ASR provider for offline unit testing and automated integration tests."""
+    """Deterministic fallback ASR provider with helpful onboarding message."""
 
     def __init__(self, fixed_text: Optional[str] = None):
         self.fixed_text = fixed_text
@@ -103,9 +200,9 @@ class MockASRProvider(ASRProvider):
     async def transcribe(self, audio_bytes: bytes, language: str = "en") -> str:
         if self.fixed_text is not None:
             return self.fixed_text
-        if len(audio_bytes) < 100:
+        if len(audio_bytes) < 1600:
             return ""
-        return "Hello MyVoice, what is the weather today?"
+        return "Configure your API key in the Falcon Console settings to enable real AI voice conversation."
 
     async def health_check(self) -> Dict[str, Any]:
         return {"ok": True, "provider": "mock", "status": "active"}

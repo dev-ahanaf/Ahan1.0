@@ -74,8 +74,8 @@ const char* ENROLLMENT_KEY  = "Pd1yEDahouFs43Pm8P-cCNWX5MGQKzYgm4-p0OO48os";
 const char* FIRMWARE_VER    = "1.1.0";
 
 // 3. Hardware Pin Definitions (SKR Diagram / XiaoZhi Bread-Compact Standard):
-#define BUTTON_EXTERNAL_PIN 5    // Touch/external button (GPIO 5 to GND)
-#define BUTTON_BOOT_PIN     0    // ESP32 on-board BOOT button (GPIO 0 to GND)
+#define BUTTON_EXTERNAL_PIN -1   // Touch/external button (set to -1 if not wired to prevent floating auto-triggers)
+#define BUTTON_BOOT_PIN     0    // ESP32 on-board BOOT button (GPIO 0 to GND, built-in hardware pull-up)
 #define STATUS_LED_PIN      18   // LED via 220 ohm resistor
 
 // INMP441 Microphone (I2S Port 0)
@@ -536,7 +536,9 @@ void sendHeartbeat() {
 // =====================================================================================
 
 bool isButtonPressed() {
-    return (digitalRead(BUTTON_EXTERNAL_PIN) == LOW) || (digitalRead(BUTTON_BOOT_PIN) == LOW);
+    if (digitalRead(BUTTON_BOOT_PIN) == LOW) return true;
+    if (BUTTON_EXTERNAL_PIN >= 0 && digitalRead(BUTTON_EXTERNAL_PIN) == LOW) return true;
+    return false;
 }
 
 void streamVoiceAudio() {
@@ -596,8 +598,10 @@ void setup() {
     Serial.println("========================================================");
 
     // Setup buttons with internal pull-up
-    pinMode(BUTTON_EXTERNAL_PIN, INPUT_PULLUP);
     pinMode(BUTTON_BOOT_PIN, INPUT_PULLUP);
+    if (BUTTON_EXTERNAL_PIN >= 0) {
+        pinMode(BUTTON_EXTERNAL_PIN, INPUT_PULLUP);
+    }
 
     initOLED();
     initAudioHardware();

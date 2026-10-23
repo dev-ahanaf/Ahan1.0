@@ -22,8 +22,10 @@ void setup() {
     delay(500);
     Serial.println("\n[System] Falcon AI Firmware v1.2 Initializing...");
 
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(BUTTON_BOOT_PIN, INPUT_PULLUP);
+    if (BUTTON_PIN >= 0) {
+        pinMode(BUTTON_PIN, INPUT_PULLUP);
+    }
     
     if (!LittleFS.begin(true)) {
         Serial.println("[LittleFS] Mount failed");
@@ -32,10 +34,10 @@ void setup() {
     ConfigStore::instance().begin();
     DisplayManager::instance().begin();
 
-    // Check for Hardware Diagnostics mode: Button held down on boot
-    if (digitalRead(BUTTON_PIN) == LOW) {
+    // Check for Hardware Diagnostics mode: BOOT button held down on boot
+    if (digitalRead(BUTTON_BOOT_PIN) == LOW) {
         delay(50);
-        if (digitalRead(BUTTON_PIN) == LOW) {
+        if (digitalRead(BUTTON_BOOT_PIN) == LOW) {
             audioInReady = initAudioIn();
             audioOutReady = initAudioOut();
             runHardwareDiagnostics();
