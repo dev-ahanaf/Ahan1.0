@@ -506,7 +506,7 @@ async def process_voice_turn(
             # LLM conversational streaming path with sentence chunking
 
             llm_provider, llm_model = ProviderManager.resolve_llm(db, device)
-            system_prompt = build_system_prompt(device)
+            system_prompt = build_system_prompt(device, db=db)
             history = get_conversation_context(db, conv.id, history_length=device.history_length)
 
             messages = [{"role": "system", "content": system_prompt}]

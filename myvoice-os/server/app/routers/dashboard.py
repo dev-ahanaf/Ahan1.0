@@ -78,8 +78,11 @@ def update_settings(
     device.tts_provider = body.tts_provider
     device.tts_voice = body.tts_voice
     device.vad_mode = body.vad_mode
+    if body.agent_id is not None:
+        device.agent_id = body.agent_id
     
     # Monotonically increment configuration version to trigger device sync
+
     device.config_version += 1
     db.commit()
     

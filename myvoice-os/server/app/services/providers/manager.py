@@ -53,14 +53,26 @@ class ProviderManager:
 
     @classmethod
     def resolve_llm(cls, db: Session, device: Optional[Device] = None) -> tuple[LLMProvider, str]:
-        """Resolve effective LLM provider and target model for device."""
-        provider_name = (device.llm_provider if device and device.llm_provider else None)
-        model_name = (device.llm_model if device and device.llm_model else None)
+        """Resolve effective LLM provider and target model for device or assigned agent."""
+        provider_name = None
+        model_name = None
+
+        if device and device.agent_id:
+            from app.models import AIAgent
+            agent = db.query(AIAgent).filter(AIAgent.id == device.agent_id).first()
+            if agent:
+                provider_name = agent.model_provider
+                model_name = agent.model_name
+
+        if not provider_name and device:
+            provider_name = device.llm_provider
+        if not model_name and device:
+            model_name = device.llm_model
 
         if not provider_name:
-            provider_name = cls.get_setting(db, "default_llm_provider", "openai").lower()
+            provider_name = cls.get_setting(db, "default_llm_provider", "gemini").lower()
         if not model_name:
-            model_name = cls.get_setting(db, "default_llm_model", "gpt-4o-mini")
+            model_name = cls.get_setting(db, "default_llm_model", "gemini-1.5-flash")
 
         if provider_name == "mock":
             return MockLLMProvider(), model_name or "mock"
@@ -80,14 +92,27 @@ class ProviderManager:
 
     @classmethod
     def resolve_tts(cls, db: Session, device: Optional[Device] = None) -> tuple[TTSProvider, str]:
-        """Resolve effective TTS provider and voice for device."""
-        provider_name = (device.tts_provider if device and device.tts_provider else None)
-        voice_name = (device.tts_voice if device and device.tts_voice else None)
+        """Resolve effective TTS provider and voice for device or assigned agent."""
+        provider_name = None
+        voice_name = None
+
+        if device and device.agent_id:
+            from app.models import AIAgent
+            agent = db.query(AIAgent).filter(AIAgent.id == device.agent_id).first()
+            if agent:
+                provider_name = agent.tts_provider
+                voice_name = agent.tts_voice
+
+        if not provider_name and device:
+            provider_name = device.tts_provider
+        if not voice_name and device:
+            voice_name = device.tts_voice
 
         if not provider_name:
             provider_name = cls.get_setting(db, "default_tts_provider", "edge-tts").lower()
         if not voice_name:
             voice_name = cls.get_setting(db, "default_tts_voice", "en-US-AriaNeural")
+
 
         if provider_name == "mock":
             return MockTTSProvider(), voice_name or "mock"

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Device, DeviceSettingsPayload } from '../types';
-import { X, Sliders, Volume2, Mic, Sun, MapPin, ShieldAlert, KeyRound, Save, AlertCircle } from 'lucide-react';
-import { saveSettings, rotateDeviceToken, revokeDevice } from '../api';
+import React, { useState, useEffect } from 'react';
+import { Device, DeviceSettingsPayload, AIAgent } from '../types';
+import { X, Sliders, Volume2, Mic, Sun, MapPin, ShieldAlert, KeyRound, Save, AlertCircle, Bot } from 'lucide-react';
+import { saveSettings, rotateDeviceToken, revokeDevice, getAgents } from '../api';
 
 interface DeviceSettingsModalProps {
   device: Device;
@@ -10,6 +10,7 @@ interface DeviceSettingsModalProps {
 }
 
 export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({ device, onClose, onSaved }) => {
+  const [agentsList, setAgentsList] = useState<AIAgent[]>([]);
   const [formData, setFormData] = useState<DeviceSettingsPayload>({
     name: device.name,
     city: device.city,
@@ -27,7 +28,7 @@ export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({ device
     search_enabled: device.search_enabled ?? true,
     timers_enabled: device.timers_enabled ?? true,
     system_prompt: device.system_prompt || '',
-    assistant_name: device.assistant_name || 'MyVoice',
+    assistant_name: device.assistant_name || 'Falcon AI',
     personality: device.personality || 'helpful, concise voice assistant',
     history_length: device.history_length ?? 6,
     asr_provider: device.asr_provider || '',
@@ -36,11 +37,17 @@ export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({ device
     tts_provider: device.tts_provider || '',
     tts_voice: device.tts_voice || '',
     vad_mode: device.vad_mode || 'manual',
+    agent_id: device.agent_id || null,
   });
+
+  useEffect(() => {
+    getAgents().then(res => setAgentsList(res.agents || [])).catch(() => {});
+  }, []);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tokenNotice, setTokenNotice] = useState<string | null>(null);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,11 +275,58 @@ export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({ device
 
           {/* AI Persona & Voice Overrides */}
           <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1677ff]">AI Persona & Voice Roles</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1677ff] flex items-center space-x-1.5">
+              <Bot className="h-3.5 w-3.5" />
+              <span>Assigned AI Persona & Voice Agent</span>
+            </h3>
+
+            {/* Agent Selector */}
+            <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40 p-3 rounded-xl space-y-1">
+              <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                Choose Falcon AI Agent Persona
+              </label>
+              <select
+                value={formData.agent_id || ''}
+                onChange={(e) => {
+                  const selectedId = e.target.value || null;
+                  if (selectedId) {
+                    const found = agentsList.find(a => a.id === selectedId);
+                    if (found) {
+                      setFormData({
+                        ...formData,
+                        agent_id: found.id,
+                        assistant_name: found.name,
+                        personality: found.personality,
+                        language: found.language,
+                        system_prompt: found.system_prompt || '',
+                        llm_provider: found.model_provider,
+                        llm_model: found.model_name,
+                        tts_provider: found.tts_provider,
+                        tts_voice: found.tts_voice
+                      });
+                      return;
+                    }
+                  }
+                  setFormData({ ...formData, agent_id: null });
+                }}
+                className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white font-medium"
+              >
+                <option value="">(Custom / Unassigned)</option>
+                {agentsList.map(a => (
+                  <option key={a.id} value={a.id}>
+                    {a.avatar} {a.name} ({a.language === 'bn' ? 'Bengali' : 'English'} • {a.model_name})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-slate-400">
+                Assigning an agent automatically applies its custom system instructions, model, and neural speech voice.
+              </p>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Assistant Name</label>
+
                 <input
                   type="text"
                   value={formData.assistant_name || ''}

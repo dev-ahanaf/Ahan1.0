@@ -90,24 +90,41 @@ def get_conversation_context(db: Session, conversation_id: str, history_length: 
     messages.reverse()
     return [{"role": m.role, "content": m.content} for m in messages]
 
-def build_system_prompt(device: Optional[Device]) -> str:
-    """Build dynamic system instructions with assistant identity and localization."""
-    name = device.assistant_name if (device and device.assistant_name) else "MyVoice"
-    personality = device.personality if (device and device.personality) else "helpful, concise voice assistant"
+def build_system_prompt(device: Optional[Device], db: Optional[Session] = None) -> str:
+    """Build dynamic system instructions with Falcon AI branding and agent localization."""
+    name = "Falcon AI"
+    personality = "intelligent, concise voice companion"
+    system_custom = None
     city = device.city if (device and device.city) else "Dhaka"
+
+    if device:
+        if device.agent_id and db:
+            from app.models import AIAgent
+            agent = db.query(AIAgent).filter(AIAgent.id == device.agent_id).first()
+            if agent:
+                name = agent.name or name
+                personality = agent.personality or personality
+                system_custom = agent.system_prompt
+        elif device.assistant_name:
+            name = device.assistant_name
+            if device.personality:
+                personality = device.personality
+            if device.system_prompt:
+                system_custom = device.system_prompt
 
     base_instructions = (
         f"You are {name}, a {personality}. "
-        f"You are conversing with the user over a real-time voice interface. "
+        f"You are conversing with the user over a real-time voice interface on their Falcon AI smart speaker. "
         f"The user's local city is {city}. "
         "Keep all responses direct, conversational, natural, and under 50 words. "
         "Do not output markdown headings, asterisks, bullet points, or emoji, as your text will be read aloud by a text-to-speech synthesizer. "
-        "Support English and Bangla according to the user's spoken language."
+        "Support English and Bengali seamlessly according to the user's spoken language."
     )
 
-    if device and device.system_prompt:
-        return f"{base_instructions}\nAdditional user instructions: {device.system_prompt}"
+    if system_custom:
+        return f"{base_instructions}\nAdditional agent instructions: {system_custom}"
     return base_instructions
+
 
 def search_conversations(db: Session, device_id: Optional[str] = None, query: str = "") -> List[Dict[str, Any]]:
     """Search conversation titles and message content."""

@@ -20,7 +20,7 @@ static bool wsInitialized = false;
 void setup() {
     Serial.begin(115200);
     delay(500);
-    Serial.println("\n[System] MyVoice OS v0.2 Initializing...");
+    Serial.println("\n[System] Falcon AI Firmware v1.2 Initializing...");
 
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(BUTTON_BOOT_PIN, INPUT_PULLUP);

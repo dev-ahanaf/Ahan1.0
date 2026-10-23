@@ -11,7 +11,10 @@ ENROLLMENT_KEY = os.getenv("ENROLLMENT_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 BRAVE_SEARCH_API_KEY = os.getenv("BRAVE_SEARCH_API_KEY", "")
 AI_MODEL = os.getenv("AI_MODEL", "gpt-4.1-mini")
-DATABASE_PATH = os.getenv("DATABASE_PATH", str(ROOT_DIR / "myvoice.db"))
+if os.getenv("VERCEL"):
+    DATABASE_PATH = os.getenv("DATABASE_PATH", "/tmp/myvoice.db")
+else:
+    DATABASE_PATH = os.getenv("DATABASE_PATH", str(ROOT_DIR / "myvoice.db"))
 
 if not Path(DATABASE_PATH).is_absolute():
     DATABASE_PATH = str((ROOT_DIR / DATABASE_PATH).resolve())

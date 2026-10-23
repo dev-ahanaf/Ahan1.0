@@ -33,6 +33,7 @@ export interface Device {
   revoked: boolean;
   online: boolean;
   tools_enabled?: string;
+  agent_id?: string | null;
 }
 
 export interface DeviceSettingsPayload {
@@ -62,7 +63,46 @@ export interface DeviceSettingsPayload {
   tts_voice?: string | null;
   vad_mode: 'manual' | 'vad';
   tools_enabled?: string;
+  agent_id?: string | null;
 }
+
+export interface AIAgent {
+  id: string;
+  name: string;
+  avatar: string;
+  description?: string;
+  personality: string;
+  system_prompt?: string;
+  language: string;
+  model_provider: string;
+  model_name: string;
+  tts_provider: string;
+  tts_voice: string;
+  response_style: string;
+  temperature: number;
+  tools_enabled: string;
+  created_at: string;
+  updated_at: string;
+  assigned_devices_count?: number;
+  assigned_devices?: Array<{ id: string; name: string; online: boolean }>;
+}
+
+export interface AgentCreatePayload {
+  name: string;
+  avatar: string;
+  description?: string;
+  personality: string;
+  system_prompt?: string;
+  language: string;
+  model_provider: string;
+  model_name: string;
+  tts_provider: string;
+  tts_voice: string;
+  response_style: string;
+  temperature: number;
+  tools_enabled: string;
+}
+
 
 export interface ProviderItem {
   id: string;

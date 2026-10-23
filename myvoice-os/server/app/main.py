@@ -14,6 +14,7 @@ from app.routers.voice import router as voice_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.ws_device import router as ws_router
 from app.routers.ota import router as ota_router
+from app.routers.agents import router as agents_router
 from fastapi import Request
 
 from app.services.scheduler import scheduler_service
@@ -29,7 +30,7 @@ async def lifespan(app: FastAPI):
     yield
     scheduler_service.stop()
 
-app = FastAPI(title="MyVoice OS", version="1.0.0-rc1", lifespan=lifespan)
+app = FastAPI(title="Falcon AI Platform", version="1.2.0", lifespan=lifespan)
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -45,8 +46,10 @@ app.include_router(pairing_router)
 app.include_router(devices_router)
 app.include_router(voice_router)
 app.include_router(dashboard_router)
+app.include_router(agents_router)
 app.include_router(ws_router)
 app.include_router(ota_router)
+
 
 # Dashboard web routes
 @app.get("/")

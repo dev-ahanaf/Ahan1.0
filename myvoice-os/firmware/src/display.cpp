@@ -84,9 +84,9 @@ void DisplayManager::update() {
 void DisplayManager::renderBooting() {
     display.setTextSize(1);
     display.setCursor(18, 12);
-    display.println("MYVOICE OS v0.1");
+    display.println("FALCON AI v1.2");
     display.drawFastHLine(10, 26, 108, SSD1306_WHITE);
-    display.setCursor(22, 38);
+    display.setCursor(16, 38);
     display.println("Booting System...");
 }
 
@@ -98,7 +98,7 @@ void DisplayManager::renderConnectingWifi() {
     display.setCursor(10, 32);
     display.println("Connecting or AP:");
     display.setCursor(10, 46);
-    display.println("SSID: MyVoice-Setup");
+    display.println("SSID: FalconAI-Setup");
 }
 
 void DisplayManager::renderConnectingServer() {

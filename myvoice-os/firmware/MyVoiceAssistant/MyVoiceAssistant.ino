@@ -151,7 +151,7 @@ void initOLED() {
         display.setTextColor(SSD1306_WHITE);
         display.setTextSize(1);
         display.setCursor(18, 15);
-        display.println("MyVoice OS");
+        display.println("FALCON AI v1.2");
         display.setCursor(20, 35);
         display.println("Initializing...");
         display.display();
@@ -169,7 +169,7 @@ void updateOLED() {
     // Top status bar
     display.setTextSize(1);
     display.setCursor(0, 0);
-    display.print("MyVoice");
+    display.print("FALCON AI");
     display.setCursor(85, 0);
     if (WiFi.status() == WL_CONNECTED) {
         display.print("WiFi ");
@@ -623,8 +623,8 @@ void setup() {
     } else {
         Serial.println("[WiFi] Not connected to AP. Starting setup mode...");
         WiFi.mode(WIFI_AP_STA);
-        WiFi.softAP("MyVoice-Setup", "myvoice123");
-        Serial.printf("[WiFi] Provisioning AP active. Connect to 'MyVoice-Setup' (pwd: myvoice123) at 192.168.4.1\n");
+        WiFi.softAP("FalconAI-Setup", "myvoice123");
+        Serial.printf("[WiFi] Provisioning AP active. Connect to 'FalconAI-Setup' (pwd: myvoice123) at 192.168.4.1\n");
     }
 
     // Check pairing or bootstrap

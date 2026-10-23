@@ -15,6 +15,7 @@ import { ToolsAndSkills } from './components/ToolsAndSkills';
 import { TimersAndAlarms } from './components/TimersAndAlarms';
 import { OTAUpdates } from './components/OTAUpdates';
 import { SystemSettings } from './components/SystemSettings';
+import { AgentsManager } from './components/AgentsManager';
 import {
   Search,
   ChevronDown,
@@ -31,8 +32,9 @@ export const App: React.FC = () => {
   const [isPairOpen, setIsPairOpen] = useState(false);
   const [activeSettingsDevice, setActiveSettingsDevice] = useState<Device | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'fleet' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system'
+    'fleet' | 'agents' | 'playground' | 'providers' | 'tools' | 'timers' | 'ota' | 'conversations' | 'system'
   >('fleet');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
@@ -209,6 +211,13 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {/* Tab: AI Agents Studio */}
+        {activeTab === 'agents' && (
+          <div className="space-y-4">
+            <AgentsManager devices={devices} onRefreshDevices={loadDevices} />
+          </div>
+        )}
+
         {/* Tab 2: Voice Clone / Voice Playground */}
         {activeTab === 'playground' && (
           <div className="space-y-4">
@@ -260,11 +269,16 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* XiaoZhi Console Footer */}
+      {/* Falcon AI Ecosystem Footer */}
       <footer className="mt-auto border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/60 py-6 px-6 text-center text-[11px] text-slate-400 space-y-1">
-        <p>© 2026 XiaoZhi AI Control Panel 2.0 &nbsp; ICP No.2022121736-2 &nbsp; Algorithm Record No.440305324629801250025</p>
-        <p>This service is powered by AI. Conversation content is AI-generated and for reference only. &nbsp; Business contact</p>
+        <p className="font-semibold text-slate-600 dark:text-slate-300">
+          🦅 Falcon AI Platform • Complete Self-Hosted ESP32 AI Voice Assistant Ecosystem v1.2
+        </p>
+        <p>
+          Bilingual Bengali & English Speech Pipeline • Fully Independent Infrastructure • OpenAI / Gemini / Ollama / Edge-TTS
+        </p>
       </footer>
+
 
       {/* Modals */}
       <PairModal

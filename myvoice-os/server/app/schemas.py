@@ -40,8 +40,43 @@ class SettingsBody(BaseModel):
     tts_provider: Optional[str] = None
     tts_voice: Optional[str] = None
     vad_mode: Literal["manual", "vad"] = "manual"
+    agent_id: Optional[str] = None
+
+class AIAgentCreateBody(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    avatar: str = Field(default="🦅", max_length=255)
+    description: Optional[str] = None
+    personality: str = Field(default="helpful, concise voice assistant", max_length=255)
+    system_prompt: Optional[str] = None
+    language: str = Field(default="en", max_length=16)
+    model_provider: str = Field(default="gemini", max_length=32)
+    model_name: str = Field(default="gemini-1.5-flash", max_length=64)
+    tts_provider: str = Field(default="edge-tts", max_length=32)
+    tts_voice: str = Field(default="en-US-AriaNeural", max_length=64)
+    response_style: str = Field(default="concise", max_length=32)
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+    tools_enabled: str = Field(default="clock,weather,search,timer,alarm,device_settings", max_length=255)
+
+class AIAgentUpdateBody(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    avatar: Optional[str] = Field(default=None, max_length=255)
+    description: Optional[str] = None
+    personality: Optional[str] = Field(default=None, max_length=255)
+    system_prompt: Optional[str] = None
+    language: Optional[str] = Field(default=None, max_length=16)
+    model_provider: Optional[str] = Field(default=None, max_length=32)
+    model_name: Optional[str] = Field(default=None, max_length=64)
+    tts_provider: Optional[str] = Field(default=None, max_length=32)
+    tts_voice: Optional[str] = Field(default=None, max_length=64)
+    response_style: Optional[str] = Field(default=None, max_length=32)
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
+    tools_enabled: Optional[str] = Field(default=None, max_length=255)
+
+class AssignAgentBody(BaseModel):
+    agent_id: Optional[str] = None
 
 class AskBody(BaseModel):
+
     text: str = Field(min_length=1, max_length=500)
     device_id: Optional[str] = None
 
@@ -76,6 +111,7 @@ class DeviceConfigOut(BaseModel):
     tts_provider: Optional[str] = None
     tts_voice: Optional[str] = None
     vad_mode: str = "manual"
+    agent_id: Optional[str] = None
 
 class ProviderTestBody(BaseModel):
     provider_type: Literal["asr", "llm", "tts"]

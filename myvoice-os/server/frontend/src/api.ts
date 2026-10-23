@@ -4,8 +4,11 @@ import {
   AIProvidersConfig,
   ConversationItem,
   ConversationMessage,
-  LiveSession
+  LiveSession,
+  AIAgent,
+  AgentCreatePayload
 } from './types';
+
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(path, {
@@ -193,4 +196,44 @@ export async function getDeviceTelemetry(device_id: string): Promise<{ telemetry
 export async function getAuditLogs(): Promise<{ audit_logs: any[] }> {
   return request('/api/admin/audit_logs');
 }
+
+// Stage 4 Falcon AI Agent Management APIs
+export async function getAgents(): Promise<{ agents: AIAgent[] }> {
+  return request('/api/admin/agents');
+}
+
+export async function createAgent(payload: AgentCreatePayload): Promise<{ ok: boolean; agent: AIAgent }> {
+  return request('/api/admin/agents', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAgent(agentId: string, payload: Partial<AgentCreatePayload>): Promise<{ ok: boolean; agent: AIAgent }> {
+  return request(`/api/admin/agents/${encodeURIComponent(agentId)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteAgent(agentId: string): Promise<{ ok: boolean; deleted_id: string }> {
+  return request(`/api/admin/agents/${encodeURIComponent(agentId)}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function assignAgentToDevice(deviceId: string, agentId: string | null): Promise<{ ok: boolean; device_id: string; agent_id: string | null }> {
+  return request(`/api/admin/devices/${encodeURIComponent(deviceId)}/assign_agent`, {
+    method: 'POST',
+    body: JSON.stringify({ agent_id: agentId }),
+  });
+}
+
+export async function testAgent(agentId: string, prompt: string): Promise<{ ok: boolean; response?: string; error?: string; latency_ms?: number; model?: string }> {
+  return request(`/api/admin/agents/${encodeURIComponent(agentId)}/test`, {
+    method: 'POST',
+    body: JSON.stringify({ prompt }),
+  });
+}
+
 

@@ -49,7 +49,8 @@ def init_db():
     curr_engine = get_engine()
     from app.models import (
         Device, Conversation, Message, SystemSetting,
-        Timer, Alarm, FirmwareRelease, DeviceTelemetry, AuditLog
+        Timer, Alarm, FirmwareRelease, DeviceTelemetry, AuditLog,
+        AIAgent, User
     )
     Base.metadata.create_all(bind=curr_engine)
     
@@ -81,6 +82,7 @@ def init_db():
             ("tts_provider", "TEXT"),
             ("tts_voice", "TEXT"),
             ("vad_mode", "TEXT NOT NULL DEFAULT 'manual'"),
+            ("agent_id", "TEXT"),
         ]
         
         for col_name, col_type in columns_to_add:
@@ -88,6 +90,66 @@ def init_db():
                 conn.execute(text(f"ALTER TABLE devices ADD COLUMN {col_name} {col_type}"))
                 conn.commit()
 
+    # Seed default agents and admin user if not present
+    seed_session = sessionmaker(autocommit=False, autoflush=False, bind=curr_engine)()
+    try:
+        if seed_session.query(AIAgent).count() == 0:
+            agent_en = AIAgent(
+                id="agent-falcon-primary",
+                name="Falcon AI Assistant",
+                avatar="🦅",
+                description="Primary bilingual Falcon AI Voice Agent with real-time reasoning and tool calling",
+                personality="helpful, concise, and intelligent voice companion",
+                system_prompt="You are Falcon AI, an intelligent, helpful voice assistant. Keep answers natural, accurate, and under 50 words. Support both English and Bengali depending on what the user speaks.",
+                language="en",
+                model_provider="gemini",
+                model_name="gemini-1.5-flash",
+                tts_provider="edge-tts",
+                tts_voice="en-US-AriaNeural",
+                response_style="concise",
+                temperature=0.7,
+                tools_enabled="clock,weather,search,timer,alarm,device_settings"
+            )
+            agent_bn = AIAgent(
+                id="agent-falcon-bangla",
+                name="Falcon AI বাংলা",
+                avatar="🇧🇩",
+                description="সম্পূর্ণ বাংলা ভয়েস সহকারী - আবহাওয়া, সময়, এলার্ম ও সাধারণ জ্ঞান",
+                personality="বন্ধুভাবাপন্ন, নির্ভুল এবং সংক্ষিপ্ত কণ্ঠ সহকারী",
+                system_prompt="আপনি ফ্যালকন এআই, একটি আধুনিক এবং সাহায্যকারী কণ্ঠ সহকারী। স্পষ্ট এবং সংক্ষিপ্ত বাংলায় উত্তর দিন। ৫০ শব্দের মধ্যে উত্তর সীমাবদ্ধ রাখুন।",
+                language="bn",
+                model_provider="gemini",
+                model_name="gemini-1.5-flash",
+                tts_provider="edge-tts",
+                tts_voice="bn-BD-NabanitaNeural",
+                response_style="concise",
+                temperature=0.7,
+                tools_enabled="clock,weather,search,timer,alarm,device_settings"
+            )
+            seed_session.add(agent_en)
+            seed_session.add(agent_bn)
+            seed_session.commit()
+
+        if seed_session.query(User).count() == 0:
+            import hashlib
+            from app.config import ADMIN_PASSWORD
+            admin_user = User(
+                id="user-admin-default",
+                username="admin",
+                email="admin@falcon-ai.local",
+                password_hash=hashlib.sha256(ADMIN_PASSWORD.encode()).hexdigest(),
+                role="admin",
+                full_name="Falcon Administrator",
+                is_active=1
+            )
+            seed_session.add(admin_user)
+            seed_session.commit()
+    except Exception:
+        seed_session.rollback()
+    finally:
+        seed_session.close()
+
 
 # Call init_db() on import so tables exist for TestClient and worker processes
 init_db()
+

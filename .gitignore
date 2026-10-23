@@ -29,3 +29,7 @@ Thumbs.db
 *.db-shm
 *.db-wal
 *.log
+
+# Cloned Upstream Reference Repositories
+xiaozhi-esp32-server/
+

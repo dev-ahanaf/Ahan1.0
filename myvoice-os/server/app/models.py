@@ -49,6 +49,7 @@ class Device(Base):
     vad_mode = Column(String(16), nullable=False, default="manual")
     revoked = Column(Integer, nullable=False, default=0)
     tools_enabled = Column(String(255), nullable=False, default="clock,weather,search,timer,alarm,device_settings")
+    agent_id = Column(String(36), nullable=True)
 
     def to_dict(self):
         """Convert model instance to standard dictionary."""
@@ -86,7 +87,74 @@ class Device(Base):
             "vad_mode": self.vad_mode,
             "revoked": bool(self.revoked),
             "tools_enabled": self.tools_enabled or "clock,weather,search,timer,alarm,device_settings",
+            "agent_id": self.agent_id,
         }
+
+
+class AIAgent(Base):
+    __tablename__ = "ai_agents"
+
+    id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String(100), nullable=False, default="Falcon Assistant")
+    avatar = Column(String(255), nullable=False, default="🦅")
+    description = Column(Text, nullable=True, default="Primary Falcon AI Voice Agent")
+    personality = Column(String(255), nullable=False, default="helpful, concise voice assistant")
+    system_prompt = Column(Text, nullable=True, default="You are Falcon AI, an intelligent, concise voice assistant. Keep answers under 50 words.")
+    language = Column(String(16), nullable=False, default="en")
+    model_provider = Column(String(32), nullable=False, default="gemini")
+    model_name = Column(String(64), nullable=False, default="gemini-1.5-flash")
+    tts_provider = Column(String(32), nullable=False, default="edge-tts")
+    tts_voice = Column(String(64), nullable=False, default="en-US-AriaNeural")
+    response_style = Column(String(32), nullable=False, default="concise")
+    temperature = Column(Float, nullable=False, default=0.7)
+    tools_enabled = Column(String(255), nullable=False, default="clock,weather,search,timer,alarm,device_settings")
+    created_at = Column(String(64), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at = Column(String(64), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "avatar": self.avatar,
+            "description": self.description,
+            "personality": self.personality,
+            "system_prompt": self.system_prompt,
+            "language": self.language,
+            "model_provider": self.model_provider,
+            "model_name": self.model_name,
+            "tts_provider": self.tts_provider,
+            "tts_voice": self.tts_voice,
+            "response_style": self.response_style,
+            "temperature": self.temperature,
+            "tools_enabled": self.tools_enabled,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    username = Column(String(64), unique=True, nullable=False, index=True)
+    email = Column(String(128), unique=True, nullable=True)
+    password_hash = Column(String(128), nullable=False)
+    role = Column(String(32), nullable=False, default="admin")
+    full_name = Column(String(100), nullable=True, default="Administrator")
+    is_active = Column(Integer, nullable=False, default=1)
+    created_at = Column(String(64), nullable=False, default=lambda: datetime.now(timezone.utc).isoformat())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "role": self.role,
+            "full_name": self.full_name,
+            "is_active": bool(self.is_active),
+            "created_at": self.created_at,
+        }
+
 
 
 class Conversation(Base):

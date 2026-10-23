@@ -9,7 +9,7 @@ bool setupWifi() {
     DisplayManager::instance().setState(DisplayState::CONNECTING_WIFI);
     Serial.println("[WiFi] Starting auto-connect or portal...");
     
-    bool connected = manager.autoConnect("MyVoice-Setup", PROVISIONING_AP_PASSWORD);
+    bool connected = manager.autoConnect("FalconAI-Setup", PROVISIONING_AP_PASSWORD);
     if (!connected) {
         Serial.println("[WiFi] Provisioning portal timed out. Restarting...");
         DisplayManager::instance().setErrorMessage("WiFi Timeout");
