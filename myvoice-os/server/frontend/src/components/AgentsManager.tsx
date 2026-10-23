@@ -45,7 +45,7 @@ export const AgentsManager: React.FC<AgentsManagerProps> = ({ devices, onRefresh
     system_prompt: 'You are Falcon AI, an intelligent, concise voice assistant. Keep answers under 50 words.',
     language: 'en',
     model_provider: 'gemini',
-    model_name: 'gemini-1.5-flash',
+    model_name: 'gemini-2.5-flash',
     tts_provider: 'edge-tts',
     tts_voice: 'en-US-AriaNeural',
     response_style: 'concise',
@@ -411,7 +411,7 @@ export const AgentsManager: React.FC<AgentsManagerProps> = ({ devices, onRefresh
                     value={formData.model_provider}
                     onChange={(e) => {
                       const prov = e.target.value;
-                      let mName = 'gemini-1.5-flash';
+                      let mName = 'gemini-2.5-flash';
                       if (prov === 'openai') mName = 'gpt-4o-mini';
                       if (prov === 'ollama') mName = 'llama3.2';
                       setFormData({ ...formData, model_provider: prov, model_name: mName });

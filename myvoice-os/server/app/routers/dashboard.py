@@ -191,8 +191,8 @@ def get_providers(_: bool = Depends(admin), db: Session = Depends(get_db)):
             {"id": "mock", "name": "Mock ASR", "description": "Deterministic testing backend"}
         ],
         "available_llm": [
+            {"id": "gemini", "name": "Google Gemini", "models": ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro", "gemini-flash-latest"]},
             {"id": "openai", "name": "OpenAI", "models": ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]},
-            {"id": "gemini", "name": "Google Gemini", "models": ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"]},
             {"id": "ollama", "name": "Ollama (Local)", "models": ["llama3.2", "mistral", "gemma2", "qwen2.5"]},
             {"id": "openai-compatible", "name": "OpenAI-Compatible", "models": ["default"]},
             {"id": "mock", "name": "Mock LLM", "models": ["mock"]}
@@ -204,9 +204,9 @@ def get_providers(_: bool = Depends(admin), db: Session = Depends(get_db)):
             {"id": "mock", "name": "Mock TTS", "voices": ["mock"]}
         ],
         "defaults": {
-            "default_asr_provider": ProviderManager.get_setting(db, "default_asr_provider", "openai"),
-            "default_llm_provider": ProviderManager.get_setting(db, "default_llm_provider", "openai"),
-            "default_llm_model": ProviderManager.get_setting(db, "default_llm_model", "gpt-4o-mini"),
+            "default_asr_provider": ProviderManager.get_setting(db, "default_asr_provider", "gemini"),
+            "default_llm_provider": ProviderManager.get_setting(db, "default_llm_provider", "gemini"),
+            "default_llm_model": ProviderManager.get_setting(db, "default_llm_model", "gemini-2.5-flash"),
             "default_tts_provider": ProviderManager.get_setting(db, "default_tts_provider", "edge-tts"),
             "default_tts_voice": ProviderManager.get_setting(db, "default_tts_voice", "en-US-AriaNeural"),
             "ollama_base_url": ProviderManager.get_setting(db, "ollama_base_url", "http://localhost:11434"),

@@ -71,12 +71,24 @@ class OpenAILLMProvider(LLMProvider):
             return {"ok": False, "provider": "openai", "error": str(exc)}
 
 
+def normalize_gemini_model(model: Optional[str]) -> str:
+    """Map deprecated Gemini model names to active Google endpoints."""
+    if not model or "1.5" in model or "2.0" in model:
+        if "pro" in (model or "").lower():
+            return "gemini-2.5-pro"
+        return "gemini-2.5-flash"
+    m = model.strip()
+    if m.startswith("models/"):
+        m = m[7:]
+    return m
+
+
 class GeminiLLMProvider(LLMProvider):
     """Google Gemini API provider with streaming generate content."""
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
-        self.model = model
+        self.model = normalize_gemini_model(model)
 
     def _convert_messages(self, messages: List[Dict[str, str]]):
         contents = []
@@ -105,7 +117,7 @@ class GeminiLLMProvider(LLMProvider):
         if not self.api_key:
             raise ValueError("Gemini API key is missing. Configure GEMINI_API_KEY in server settings.")
 
-        target_model = model or self.model
+        target_model = normalize_gemini_model(model or self.model)
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:streamGenerateContent?key={self.api_key}&alt=sse"
         contents, system_instruction = self._convert_messages(messages)
 
@@ -143,11 +155,12 @@ class GeminiLLMProvider(LLMProvider):
         if not self.api_key:
             return {"ok": False, "provider": "gemini", "error": "API key not configured"}
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={self.api_key}"
+            target_model = normalize_gemini_model(self.model)
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}?key={self.api_key}"
             async with httpx.AsyncClient(timeout=10.0) as client:
                 resp = await client.get(url)
                 if resp.status_code == 200:
-                    return {"ok": True, "provider": "gemini", "model": self.model}
+                    return {"ok": True, "provider": "gemini", "model": target_model}
                 return {"ok": False, "provider": "gemini", "error": f"HTTP {resp.status_code}: {resp.text[:120]}"}
         except Exception as exc:
             return {"ok": False, "provider": "gemini", "error": str(exc)}

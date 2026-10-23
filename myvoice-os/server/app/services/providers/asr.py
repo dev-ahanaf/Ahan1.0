@@ -134,9 +134,14 @@ class GroqWhisperProvider(ASRProvider):
 class GeminiASRProvider(ASRProvider):
     """Speech transcription using Google Gemini multimodal audio recognition."""
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
-        self.model = model
+        m = model or "gemini-2.5-flash"
+        if "1.5" in m or "2.0" in m:
+            m = "gemini-2.5-flash"
+        if m.startswith("models/"):
+            m = m[7:]
+        self.model = m
 
     async def transcribe(self, audio_bytes: bytes, language: str = "en") -> str:
         if not self.api_key:
